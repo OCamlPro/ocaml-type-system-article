@@ -1,0 +1,99 @@
+\begin{figure}
+\begin{framed}
+\begin{mathpar}
+  {\inferrule*[left=Inst-Var-Unbound]
+    {'a \notin \theta }
+    {\Gamma, \Phi, \theta \tht ~\tau \leq ~'a \Ra \theta \oplus ['a \rightarrow \tau]}
+  }
+  \and
+  {\inferrule*[left=Inst-Var-Bound]
+    {'a \in \theta \\
+      \Gamma, \Phi, \theta \tht \tau_{'a} \equiv \tau}
+    {\Gamma, \Phi, \theta \oplus ['a \rightarrow \tau_{'a}] \tht ~\tau \leq ~'a
+      \Ra \theta \oplus ['a \rightarrow \tau_{'a}]}
+  }
+  \and
+  {\inferrule*[left=Inst-Var-Generalized]
+    {generalized('a_1) \implies
+      generalized('a_2)
+    }
+    {\Gamma, \Phi, \theta \tht ~'a_1 \leq ~'a_2 \Ra \theta \oplus ['a_2 \rightarrow 'a_1]}
+  }
+  \and
+  {\inferrule*[left=Inst-Fun]
+    {l_1 = l_1' \\
+      \Gamma, \Phi, \theta \tht \tau_1 \leq \tau_1' \Ra \theta_1 \\
+      \Gamma, \Phi, \theta_1 \tht \tau_2 \leq \tau_2' \Ra \theta_2}
+    {\Gamma, \Phi, \theta \tht (l_1:\tau_1) \rightarrow \tau_2 \leq
+      (l_1':\tau_1') \rightarrow \tau_2' \Ra \theta_2}
+  }
+  \and
+  {\inferrule*[left=Inst-Tuple]
+    {\Gamma, \Phi, \theta \tht \tau_0 \leq \tau_0' \Ra \theta_0 \\
+      \forall i_{\geq 1}. ~ \Gamma, \Phi, \theta_{i-1} \tht \tau_i \leq \tau_i' \Ra \theta_i}
+    {\Gamma, \Phi, \theta \tht \tau_0 * .. * \tau_n \leq \tau_0' * .. * \tau_n'
+      \Ra \theta_n}}
+  \and
+  {\inferrule*[left=Inst-Construct]
+    {\Gamma, \Phi, \theta \tht \tau_0 \leq \tau_0' \Ra \theta_0 \\
+      \forall i_{\geq 1}. ~ \Gamma, \Phi, \theta_{i-1} \tht \tau_i \leq \tau_i' \Ra \theta_i}
+    {\Gamma, \Phi, \theta \tht (\overline{\tau})~ {\tt t} \leq (\overline{\tau'})~ {\tt p}
+      \Ra \theta_n}}
+  \and
+  {\inferrule*[left=Inst-Construct-Exp-Left]
+    { let~ \tau = expand(\Gamma, \Phi, {\tt t}, \overline{\tau}) \\
+      \Gamma, \Phi, \theta \tht \tau \leq \tau' \Ra \theta'}
+    {\Gamma, \Phi, \theta \tht (\overline{\tau})~ {\tt t} \leq \tau'
+      \Ra \theta'}}
+  \and
+  {\inferrule*[left=Inst-Construct-Exp-Right]
+    { let~ \tau' = expand(\Gamma, \Phi, {\tt t'}, \overline{\tau'}) \\
+      \Gamma, \Phi, \theta \tht \tau \leq \tau' \Ra \theta' }
+    {\Gamma, \Phi, \theta \tht \tau \leq (\overline{\tau'})~ {\tt t'}
+      \Ra \theta'}}
+  \and
+  {\inferrule*[left=Inst-Poly]
+    {let~ \theta' = \forall i. \theta \oplus [\alpha_i' \rightarrow \alpha_i] \\
+      \Gamma, \Phi, \theta' \tht \tau \leq \tau' \Ra \theta''}
+    {\Gamma, \Phi, \theta \tht \forall \overline{\alpha}. ~\tau \leq
+      \forall \overline{\alpha'}. ~ \tau' \Ra \theta''}}
+  \and
+  {\inferrule*[left=Inst-Univar]
+    {[\alpha' \rightarrow \alpha ] \in \theta}
+    {\Gamma, \Phi, \theta \tht \alpha \leq \alpha' \Ra \theta}}
+  \and
+  {\inferrule*[left=Inst-Rigid1]
+    {\Phi({\tt t}) = \Phi(\tau)}
+    {\Gamma.Types \oplus ({\tt t} : \R), \Phi, \theta \tht \tau \leq {\tt t} \Ra \theta}}
+  \and
+  {\inferrule*[left=Inst-Rigid2]
+    {\Phi({\tt t}) = \Phi(\tau)}
+    {\Gamma.Types \oplus ({\tt t} : \R), \Phi, \theta \tht {\tt t} \leq \tau \Ra \theta}}
+  \and
+  {\inferrule*[left=Inst-Variant]
+    { T_{pres_i} ~..~ T_{pres_j} \subseteq T_{pres_i}' ~..~ T_{pres_j}' \\
+      \Gamma, \Phi, \theta \tht \rho \leq \rho' \Ra \theta_\rho \\
+      \forall i.~ T_i \in \overline{T'} \implies
+      \Gamma, \Phi, \theta_{i-1} \tht \tau_{var_i} \leq \tau_{var_i}' \Ra \theta_i
+    }
+    {\Gamma, \Phi, \theta \tht [(\rho)~ \overline{T~of~\tau_{var}} > T_{pres_i} ~..~ T_{pres_j}]
+      \leq [(\rho')~ \overline{T'~of~\tau_{var}'} > T_{pres_i}' ~..~ T_{pres_j}'] \Ra \theta_n}}
+  \and
+  {\inferrule*[left=Inst-Nil]
+    {}
+    {\Gamma, \Phi, \theta \tht \epsilon \leq \epsilon \Ra \theta}}
+  \and  
+  {\inferrule*[left=Inst-Package]
+    {let~ S = Sig({\tt P} ~ \kwd{with} ~\overline{\kwd{type} ~{\tt t} = \tau}) \\
+     let~ S' = Sig({\tt P}' ~\kwd{with} ~\overline{\kwd{type} ~{\tt t'} = \tau'}) \\
+      \Gamma, \Phi, \theta \tht S' :> S \Ra \theta'}
+    {\Gamma, \Phi, \theta \tht (\kwd{module} ~ {\tt P} ~\kwd{with}
+      ~\overline{\kwd{type} ~{\tt t} = \tau})
+      \leq (\kwd{module} ~ {\tt P}' ~\kwd{with} ~\overline{\kwd{type} ~{\tt t'}
+        = \tau'})
+      \Ra \theta'}}
+  
+\end{mathpar}
+\end{framed}
+\caption{\label{fig:inst}Type instanciation rules}
+\end{figure}

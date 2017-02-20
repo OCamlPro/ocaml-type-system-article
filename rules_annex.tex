@@ -1,0 +1,434 @@
+
+%FIXME: les règles nécessitent une passe de correction
+
+\subsection{OCaml expressions (without objects)}
+
+\begin{framed}
+\begin{mathpar}
+  {\inferrule*[left=Tuple]
+    {\forall i. ~ \Gamma, \Phi \thx \langle e_i : \tau_i' \rangle \\
+      \Gamma, \Phi \tht \tau \Lra \tau_0~ * ~..~ * ~\tau_n \\
+      \forall i. \Gamma, \Phi \tht \tau_i \equiv \tau_i'}
+    {\Gamma, \Phi \thx \langle (e_0,~ ..~,~ e_n) : \tau \rangle}
+  }
+  \and
+  {\inferrule*[left=Match]
+    { \Gamma, \Phi \thx \langle e : \tau_{scrut} \rangle \\
+      %% \Gamma, \Phi \tht \tau \equiv \tau' \\
+      \forall i.~ \Gamma, \Phi, \Sigma, \Sigma \thp \langle p_i : \tau_i \rangle \Ra
+      (\overline{v_{i} : \tau_{i}}), (\overline{\tau_{\exists_i}}), \Phi_i\\
+      \forall i.~ let ~\Gamma_i = \Gamma
+      \oplus_{\V} (\overline{v_{i} : \tau_{i}})
+      \oplus (\overline{\tau_{\exists_i}}) \\
+      \forall i.~ \Gamma_i, \Phi_i \thx \langle e_i : \tau_{e_i} \rangle \\
+      \forall i.~ \Gamma, \Phi \tht \tau_{e_i} ~wf \\
+      \forall i.~ \Gamma_i, \Phi_i \tht \tau \equiv \tau_{e_i}
+    }
+    {\Gamma, \Phi \thx \langle \kwd{match} ~e~ \kwd{with}~ \overline{|~ p \rightarrow e} :
+      \tau \rangle }
+  }
+  \and
+  {\inferrule*[left=Record]
+    { let ~\tau_{rec} = \Gamma.Types(\tau) \\
+      \forall i. let ~\tau_{l_i} = find\_label(\Gamma, \Phi, l_i, \tau_{rec}) \\
+      \forall i.~ \Gamma, \Phi \thx \langle e : \tau_i \rangle \\
+      \Gamma, \Phi, \Sigma \tht \tau_0 \leq \tau_{l_0} \Ra \theta_0 \\
+      \forall i_{\geq 1}. ~\Gamma, \Phi, \theta_{i-1} \tht \tau_i \leq \tau_{l_i}
+      \Ra \theta_i \\
+      let ~\tau_{inst} = \theta_n(\tau_{rec}) \\
+      \Gamma, \Phi \tht \tau_{inst} \equiv \tau
+    }
+    {\Gamma, \Phi \thx \langle \{ l_0 = e_0; ~..~; l_n = e_n \} : \tau \rangle }
+  }
+  \and
+  {\inferrule*[left=Field]
+    {
+      \Gamma, \Phi \thx \langle e : \tau_e \rangle \\
+      let ~\tau_{rec} = \Gamma.Types(\tau_e) \\
+      let ~\tau_{l} = find\_label(\Gamma, \Phi, l, \tau_{rec}) \\
+      \Gamma, \Phi, \Sigma \tht \tau \leq \tau_{l} \Ra \theta \\
+      let ~\tau_{inst} = \theta(\tau_{rec}) \\
+      \Gamma, \Phi \tht \tau_{inst} \equiv \tau_e
+    }
+    {\Gamma, \Phi \thx \langle e.l : \tau \rangle}
+  }
+\end{mathpar}
+\end{framed}
+%\caption{Functional features from OCaml}
+%\end{figure}
+
+
+%% \begin{figure}
+  \begin{framed}
+  \begin{mathpar}
+
+  {\inferrule*[left=Set-Field]
+    {
+      \Gamma, \Phi \thx \langle e_1 : \tau_1 \rangle \\
+      \Gamma, \Phi \thx \langle e_2 : \tau_2 \rangle \\
+      let~ \tau_{rec} = \Gamma.Types(\tau_1) \\
+      let~ \tau_{l} = find\_label(\Gamma, \Phi, l, \tau_{rec}) \\
+      label\_kind(\Gamma, \Phi, l, \tau_{rec}) ~is ~Mutable \\
+      \Gamma, \Phi, \Sigma \tht \tau_2 \leq \tau_{l} \Ra \theta \\
+      let~ \tau_{inst} = \theta(\tau_{rec}) \\
+      \Gamma, \Phi \tht \tau_{inst} \equiv \tau_1 \\
+      \Gamma, \Phi \tht \tau \equiv {\tt unit}
+    }
+    {\Gamma, \Phi \thx \langle e_1.l \shortleftarrow e_2 : \tau \rangle }
+  }
+  \and
+  {\inferrule*[left=Array]
+    { \forall i.~ \Gamma, \Phi \thx \langle e_i : \tau_i \rangle \\
+      \forall i_{\geq 1}.~ \Gamma, \Phi \tht \tau_{i-1} \equiv \tau_i \\
+      \Gamma, \Phi \tht \tau \Lra \tau_{arg} ~ {\tt array} \\
+      \Gamma, \Phi \tht \tau_0 \equiv \tau_{arg}
+    }
+    {\Gamma, \Phi \thx \langle [| e_0; ~..~; e_n |] : \tau \rangle}
+  }
+  \and
+  {\inferrule*[left=Sequence]
+    {
+      \Gamma, \Phi \thx \langle e_1 : \tau_1 \rangle \\
+      \Gamma, \Phi \thx \langle e_2 : \tau_2 \rangle \\
+      \Gamma, \Phi \tht \tau_1 \equiv {\tt unit} \\
+      \Gamma, \Phi \tht \tau \equiv \tau_2
+    }
+    {\Gamma, \Phi \thx \langle e_1;~ e_2 : \tau \rangle }
+  }
+  \and
+  {\inferrule*[left=While]
+    {
+      \Gamma, \Phi \thx \langle e_1 : \tau_1 \rangle \\
+      \Gamma, \Phi \thx \langle e_2 : \tau_2 \rangle \\
+      \Gamma, \Phi \tht \tau_1 \equiv {\tt bool} \\
+      \Gamma, \Phi \tht \tau_2 \equiv {\tt unit} \\
+      \Gamma, \Phi \tht \tau \equiv {\tt unit}
+    }
+    {\Gamma, \Phi \thx \langle \kwd{while} ~ e_1~ \kwd{do}~ e_2 ~ \kwd{done} : \tau \rangle }
+  }
+  \and
+  {\inferrule*[left=For]
+    {
+      \Gamma, \Phi \thx \langle e_1 : \tau_1 \rangle \\
+      \Gamma, \Phi \thx \langle e_2 : \tau_2 \rangle \\
+      \Gamma, \Phi \tht \tau_1 \equiv {\tt int} \\
+      \Gamma, \Phi \tht \tau_2 \equiv {\tt int} \\
+      \Gamma \oplus_{\V} (x, \tau_1), C.\Phi \thx \langle e_3 : \tau_3 \rangle \\
+      \Gamma, \Phi \tht \tau_3 \equiv {\tt unit} \\
+      \Gamma, \Phi \tht \tau \equiv {\tt unit}
+    }
+    {\Gamma, \Phi \thx \langle \kwd{for} ~ x = e_1 ~\kwd{to} ~ e_2~
+      \kwd{do}~ e_3 ~ \kwd{done} : \tau \rangle }
+  }
+
+  \end{mathpar}
+  \end{framed}
+%% \caption{Imperative features}
+%% \end{figure}
+
+
+
+  
+%% \begin{figure}
+  \begin{framed}
+  \begin{mathpar}
+  {\inferrule*[left=Raise]
+    {
+      \Gamma, \Phi \thx \langle e : \tau_e \rangle \\
+      \Gamma, \Phi \tht (\tau_e \equiv {\tt exn}) \\
+      \Gamma, \Phi \tht (\tau \equiv {\tt unit})
+    }
+    {\Gamma, \Phi \thx \langle \kwd{assert} ~e : \tau \rangle }
+  }
+  \and
+  {\inferrule*[left=Assert]
+    {
+      \Gamma, \Phi \thx \langle e : \tau_e \rangle \\
+      \Gamma, \Phi \tht (\tau_e \equiv {\tt bool}) \\
+      \Gamma, \Phi \tht (\tau \equiv {\tt unit})
+    }
+    {\Gamma, \Phi \thx \langle \kwd{assert} ~e : \tau \rangle }
+  }
+  \and
+  {\inferrule*[left=Assert-False]
+    {
+      \Gamma, \Phi \thx \langle false : \tau_e \rangle \\
+      \Gamma, \Phi \tht (\tau_e \equiv {\tt bool})
+    }
+    {\Gamma, \Phi \thx \langle \kwd{assert} ~false : \tau \rangle }
+  }
+  \and
+  {\inferrule*[left=Lazy]
+    {
+      \Gamma, \Phi \thx \langle e : \tau_e \rangle \\
+      \Gamma, \Phi \tht \tau \Lra \tau_{arg} ~ {\tt Lazy.t} \\
+      \Gamma, \Phi \tht \tau_e \equiv \tau_{arg}
+    }
+    {\Gamma, \Phi \thx \langle \kwd{lazy} ~e : \tau \rangle}
+  }
+  \and
+  {\inferrule*[left=Variant-Const]
+    {
+      \Gamma, \Phi \tht \tau \Lra [(\rho)~..~ T ~..~  > ..~ T~..~]}
+    {\Gamma, \Phi \thx \langle `T : \tau \rangle}
+  }
+  \and
+  {\inferrule*[left=Variant]
+    {
+      \Gamma, \Phi \tht \tau \Lra [(\rho) ..~ T~of~\tau_{arg} ~..~  > ..~ T~..~] \\
+      \Gamma, \Phi \thx \langle e : \tau_e \rangle \\
+      \Gamma, \Phi \tht \tau_{arg} \equiv \tau_e
+    }
+    {\Gamma, \Phi \thx \langle `T ~ e: \tau \rangle }
+  }
+  \and
+  {\inferrule*[left=Constraint]
+    { \Gamma, \Phi, \Sigma \thct \langle t : \tau_{cstr} \rangle \Ra \V \\
+      \Gamma, \Phi \thx \langle e : \tau_e \rangle \\
+      \Gamma, \Phi, \Sigma \tht \tau_e \leq \tau_{cstr} \Ra \theta \\
+      \Gamma, \Phi \tht \tau \equiv \tau_e
+    }
+    { \Gamma, \Phi \thx \langle (e : t) : \tau \rangle }
+  }
+  \and
+  {\inferrule*[left=Newtype]
+    { let~ \Gamma' = \Gamma.Types \oplus ({\tt t}: \R) \\
+      \Gamma' \thx \langle e : \tau_e \rangle \\
+      let~ \alpha~ fresh(\Gamma) \\
+      let~ \theta = [{\tt t} \rightarrow \alpha] \\
+      let~ \tau_t = \theta (\tau_e) \\
+      \Gamma, \Phi \tht \tau \equiv \tau_t\\
+      \Gamma, \Phi \tht \tau ~wf
+    }
+    { \Gamma, \Phi \thx \langle \kwd{fun}~ (\kwd{type}~ {\tt t}) \rightarrow e : \tau \rangle }
+  }
+  \and
+  {\inferrule*[left=Let-Module]
+    { \Gamma, \Phi \thm \langle M : \M \rangle \\
+      \Gamma.Modules \oplus ({\tt I}, \M), \Phi \thx \langle e : \tau_e \rangle \\
+      \Gamma, \Phi \tht \tau_e ~wf \\
+      \Gamma, \Phi \tht \tau \equiv \tau_e
+    }
+    { \Gamma, \Phi \thx \langle \kwd{let}~ \kwd{module}~ {\tt I} = M~ \kwd{in} ~e : \tau \rangle}
+  }
+
+  \end{mathpar}
+  \end{framed}
+%% \caption{Extensions}
+%% \end{figure}
+
+
+  
+\subsection{OCaml patterns}
+
+% \begin{figure}
+\begin{framed}
+  \begin{mathpar}
+
+    {\inferrule*[left=Pat-Record]
+      { let ~\tau_{rec} = find\_record(\Gamma, \Phi, \tau) \\
+        \forall i.~ let~ \tau_{l_i} = find\_label(\Gamma, \Phi, l_i, \tau_{rec}) \\
+        \Gamma, \Phi, \V, \T~ \thp \langle p_0 : \tau_0 \rangle \Ra
+        \V_0, \T_0, \Phi_0\\
+        \forall i_{\geq 1}.~ \Gamma, \Phi_{i-1}, \V_{i-1}, \T_{i-1}~ \thp \langle p_i : \tau_i \rangle \Ra
+        \V_i, \T_i, \Phi_i \\
+        \Gamma, \Phi_0 \tht \tau_0 \leq \tau_{l_0} \Ra \theta_0 \\
+        \forall i_{\geq 1}. ~\Gamma, \Phi_i, \theta_{i-1} \tht \tau_i \leq \tau_{l_i}
+        \Ra \theta_i \\
+        let~ \tau_{inst} = \theta_n(\tau_{rec}) \\
+        \Gamma, \Phi_n \tht \tau_{inst} \equiv \tau % \\
+        % let~ \V' = \V \uplus \V_0 \uplus ~.. ~\uplus \V_n \\
+        % let ~\T' = \T \cup \T_0 \cup ~.. ~\cup \T_n
+      }
+      {\Gamma, \Phi, \V, \T ~ \thp \langle \{ l_0 = p_0; ~..~; l_n = p_n \} : \tau \rangle \Ra
+        \V_n, \T_n, \Phi_n }
+    }
+    \and
+    {\inferrule*[left=Pat-Array]
+      { \Gamma, \Phi, \V, \T~ \thp \langle p_0 : \tau_0 \rangle \Ra
+        \V_0, \T_0, \Phi_0\\
+        \forall i_{\geq 1}.~ \Gamma, \Phi_{i-1}, \V_{i-1}, \T_{i-1}
+        \thp \langle p_i : \tau_i \rangle \Ra \V_i, \T_i, \Phi_i \\
+        \forall i_{\geq 1}.~ \Gamma, \Phi_i \vdash \tau_{i-1} \equiv \tau_i \\
+        \Gamma, \Phi \tht \tau \Lra \tau'~ {\tt array} \\
+        \Gamma, \Phi_0 \tht \tau_0 \equiv \tau % \\
+        % let~ \V' = \V \uplus \V_0 \uplus ~.. ~\uplus \V_n \\
+        % let ~\T' = \T \cup \T_0 \cup ~.. ~\cup \T_n
+      }
+      {\Gamma, \Phi, \V, \T \thp \langle [| p_0; ~..~; p_n |] : \tau \rangle \Ra \V_n, \T_n, \Phi_n}
+    }
+    \and
+    {\inferrule*[left=Pat-Lazy]
+      { \Gamma, \Phi, \V, \T \thp p : \tau_p \Ra \V', \T', \Phi' \\
+        \Gamma, \Phi \tht \tau \Lra \tau'~ {\tt Lazy.t} \\
+        \Gamma, \Phi' \tht \tau' \equiv \tau_p
+      }
+      {\Gamma, \Phi, \V \thp \langle \kwd{lazy} ~ p : \tau \rangle \Ra \V', \T', \Phi'
+      }
+    }
+    \and
+    {\inferrule*[left=Pat-Variant-Const]
+      { \Gamma, \Phi_p \tht \tau \Lra [(\rho)~ T > ..~]
+      }
+      {\Gamma, \Phi, \V, \T \thp \langle `T : \tau \rangle \Ra \V, \T, \Phi
+      }
+    }
+    \and
+    {\inferrule*[left=Pat-Variant]
+      {
+        \Gamma, \Phi \tht \tau \Lra [(\rho)~ T ~of~ \tau_{arg} > ..~] \\
+        %% \tau_0 .. \tau_n \leftarrow may\_appear\_tag (\Gamma, \Phi, `T, \tau) \\
+        \Gamma, \Phi, \V, \T \thp \langle p : \tau_p \rangle \Ra \V', \T', \Phi' \\
+        \Gamma, \Phi' \tht \tau_{arg} \equiv \tau_p
+      }
+      {\Gamma, \Phi, \V, \T \thp \langle `T~ p: \tau \rangle \Ra \V', \T', \Phi'
+      }
+    }
+    \end{mathpar}
+\end{framed}
+%% \caption{Remaining pattern typing rules}
+%% \end{figure}
+
+
+\subsection{OCaml type annotations}
+
+These annotations can appear as constraints on expressions, as types of labels
+from record declaration or arguments of constructor declarations.
+
+\endinput
+
+
+\begin{framed}
+  \begin{mathpar}
+    {\inferrule*[left=Core-Var-Bound]
+      {
+        \Gamma, \Phi \tht \tau \equiv \tau_{a}
+      }
+      {\Gamma, \Phi, \V \oplus ('a, \tau_{a}) \thct \langle 'a : \tau \rangle
+        \Ra \V \oplus ('a, \tau_{a})}
+    }
+    \and
+    {\inferrule*[left=Core-Var-Unbound]
+      {
+      }
+      {\Gamma, \Phi, \V \thct \langle 'a : \tau \rangle \Ra V \oplus ('a, \tau)}
+    }
+    \and
+    {\inferrule*[left=Core-Any]
+      {}
+      {\Gamma, \Phi, \V \thct \langle \_ : \tau) \Ra \V}
+    }
+    \and
+    {\inferrule*[left=Core-Arrow]
+      {\Gamma, \Phi, \V \thct \langle t_1 : \tau_1 \rangle \Ra \V_1\\
+        \Gamma, \Phi, \V_1 \thct \langle t_2 : \tau_2' \rangle \Ra \V_2\\
+        l = l' \\
+        \Gamma, \Phi \tht \tau_d \equiv \tau_1 \\
+        \Gamma, \Phi \tht \tau_{cd} \equiv \tau_2
+      }
+      {\Gamma, \Phi, \V \thct \langle (l:t_1) \rightarrow t_2 : ~
+        (l': \tau_d) \rightarrow \tau_{cd} \rangle \Ra \V_2}
+    }
+    \and
+    {\inferrule*[left=Core-Tuple]
+      { \Gamma, \Phi, \V \thct \langle t_0 : \tau_0' \rangle \Ra \V_0 \\
+        \forall i_{\geq 1}.~ \Gamma, \Phi, \V_{i-1} \thct \langle t_i : \tau_i'\rangle \Ra \V_i\\
+        \forall i.~ \Gamma, \Phi \tht \tau_i \equiv \tau_i'
+      }
+      {\Gamma, \Phi, \V \thct \langle t_0 * .. * t_n : \tau_0 * .. * \tau_n \rangle \Ra \V_n}
+    }
+    \and
+    {\inferrule*[left=Core-Constr]
+      {\Gamma, \Phi, \V \thct \langle t_0 : \tau_0' \rangle \Ra \V_0 \\
+        \forall i_{\geq 1}.~ \Gamma, \Phi, \V_{i-1}, \thct \langle t_i : \tau_i'
+        \rangle \Ra \V_i \\
+        \forall i.~ \Gamma, \Phi \tht \tau_i \equiv \tau_i' \\
+        {\tt t} = {\tt t'} \\
+        \Gamma, \Phi \tht (\overline{\tau}) ~{\tt t'} ~ wf
+      }
+      {\Gamma, \Phi, \V
+        \thct \langle (\overline{t}) ~{\tt t} : (\overline{\tau}) ~{\tt t'} \rangle
+        \Ra \V_n}
+    }
+    \and
+    {\inferrule*[left=Core-Poly]
+      { \forall i. ~\Gamma, \Phi \tht \tau_i \Lra \alpha_i \\
+        \Gamma, \Phi, \V \oplus (\overline{'a, \alpha})
+        \thct \langle t : \tau_{poly} \rangle \Ra \V_{poly} \\
+        \Gamma, \Phi \tht \tau \equiv \tau_{poly}
+      }
+      {\Gamma, \Phi, \V
+        \thct \langle \overline{'a}.~ t : \overline{\tau}.~ \tau \rangle
+        \Ra \V_{poly}}
+    }
+    \and
+    {\inferrule*[left=Core-Alias-Nonrec]
+      {
+        \Gamma, \Phi, \V \thct \langle t : \tau_{al} \rangle \Ra \V_{al} \\
+        'a ~\notin~ \V_{al} \\
+        \Gamma, \Phi \tht \tau \equiv \tau_{al}
+      }
+      {\Gamma, \Phi, \V \thct \langle t ~ \kwd{as} ~'a \rangle : \tau \Ra \V_{al}}
+    }
+    \and
+    {\inferrule*[left=Core-Variant-Static]
+      { \Gamma, \Phi, \V \thct \langle t_0 : \tau_0' \rangle \Ra \V_0 \\
+        \forall i.~ \Gamma, \Phi, \V_{i-1} \thct \langle t_i : \tau_i' \rangle
+        \Ra \V_i \\
+        \forall i.~ T_i \in [T_{pres_i} ~..~ T_{pres_j} ] \\
+        \forall i.~ \Gamma, \Phi \tht \tau_i \equiv \tau_i' \\
+        \Gamma, \Phi \tht \rho \Lra \epsilon
+      }
+      {\Gamma, \Phi, \V \thct \langle [\overline{T ~of ~t}] :
+        [(\rho)~ \overline{|~ T ~?of ~\tau} > T_{pres_i} .. T_{pres_j}] \rangle
+        \Ra \V_n
+      }
+    }
+    \and
+    {\inferrule*[left=Core-Variant-Closed]
+      { \Gamma, \Phi, \V \thct \langle t_0 : \tau_0' \rangle \Ra \V_0 \\
+        \forall i.~ \Gamma, \Phi, \V_{i-1} \thct \langle t_i : \tau_i' \rangle
+        \Ra \V_i \\
+        \forall i.~ T_{pres_i} \in [T_{pres_i}' ~..~ T_{pres_j}' ] \\
+        \forall i.~ \Gamma, \Phi \tht \tau_i \equiv \tau_i' \\
+        \Gamma, \Phi \tht \rho \Lra 'a
+      }
+      {\Gamma, \Phi, \V
+        \thct \langle [\overline{T ~of ~t} > T_{pres_i} ~..~ T_{pres_j}] :
+        [(\rho)~ \overline{|~ T ~?of ~\tau} > T_{pres_i} ~..~ T_{pres_j}] \rangle
+        \Ra \V_n
+      }
+    }
+    \and
+    {\inferrule*[left=Core-Variant-Open]
+      { \Gamma, \Phi, \V \thct \langle t_0 : \tau_0' \rangle \Ra \V_0 \\
+        \forall i.~ \Gamma, \Phi, \V_{i-1}
+        \thct \langle t_i : \tau_i' \rangle \Ra \V_i \\
+        \forall i.~ T_i \in [T_{pres_i} ~..~ T_{pres_j} ] \\
+        \forall i.~ \Gamma, \Phi \tht \tau_i \equiv \tau_i' \\
+        \Gamma, \Phi \tht \rho \Lra 'a
+      }
+      {\Gamma, \Phi, \V \thct \langle [> \overline{T ~of ~t}] :
+        [(\rho)~ \overline{|~ T ~?of ~\tau} > T_{pres_i} ~..~ T_{pres_j}] \rangle
+        \Ra \V_n
+      }
+    }
+    \and
+    {\inferrule*[left=Core-Package]
+      { {\tt S} = {\tt S'} \\
+        \forall i.~ {\tt t_i} = {\tt t_i'} \\
+        \Gamma, \Phi, \V \thct \langle t_0 : \tau_0' \rangle \Ra \V_0 \\
+        \forall i_{\geq 1}.~ \Gamma, \Phi, \V_{i-1}
+        \thct \langle t_i : \tau_i' \rangle \Ra \V_i \\
+        \forall i.~ \Gamma, \Phi \tht \tau_i \equiv \tau_i' \\
+        \Gamma, \Phi \tht
+        (\kwd{module}~ S'~ \kwd{with}~ \kwd{type}~ \overline{{\tt t'} = \tau})) ~ wf
+      }
+      {\Gamma, \Phi, \V \thct \langle (\kwd{module}~ {\tt S}~
+        \kwd{with}~ \kwd{type}~ \overline{{\tt t} = t}) :
+        (\kwd{module}~ {\tt S'}~
+        \kwd{with}~ \kwd{type}~ \overline{{\tt t'} = \tau}) \rangle \Ra \V_n }
+    }
+
+  \end{mathpar}
+  \end{framed}

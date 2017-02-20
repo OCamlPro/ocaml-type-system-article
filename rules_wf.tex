@@ -1,0 +1,52 @@
+\begin{figure}
+  \begin{framed}
+\begin{mathpar}
+  {\inferrule*[left=Wf-Var]
+    {}
+    {\Gamma, \Phi \tht ~'a ~ \wf}
+  }
+  \and
+  {\inferrule*[left=Wf-Fun]
+    {\Gamma, \Phi \tht \tau_1 ~ \wf\\ \Gamma, \Phi \tht \tau_2 ~ \wf}
+    {\Gamma, \Phi \tht (l:\tau_1) \rightarrow \tau_2 ~ \wf}
+  }
+  \and
+  {\inferrule*[left=Wf-Tuple]
+    {\forall \tau_i. ~ \Gamma, \Phi \tht \tau_i ~ \wf}
+    {\Gamma, \Phi \tht \tau_0 * .. * \tau_n ~ \wf}}
+  \and
+  {\inferrule*[left=Wf-Construct]
+    {let ~ (\overline{\tau_{param}}) ~ {\tt t} =
+      \Gamma.Types({\tt t})\\
+      \forall i. \Gamma, \Phi \tht \tau_i ~ \wf \\
+      \Gamma, \Phi, \Sigma \tht (\overline{\tau})~ {\tt t} \leq (\overline{\tau_{param}}) ~
+      {\tt t} \Ra \theta}
+    {\Gamma, \Phi \tht (\overline{\tau})~ {\tt t} ~~ \wf}}
+  \and
+  {\inferrule*[left=Wf-Poly]
+    {\forall i.~ \Gamma, \Phi \tht \tau_{\alpha_i} \Lra \alpha_i \\
+      \Gamma \oplus \overline{\alpha}, \Phi \tht \tau ~ \wf}
+    {\Gamma, \Phi \tht \forall \overline{\tau_\alpha}. ~\tau ~~ \wf}}
+  \and
+  {\inferrule*[left=Wf-Univar]
+    {\alpha \in \Gamma}
+    {\Gamma, \Phi \tht \alpha ~ \wf}}
+  \and
+  {\inferrule*[left=Wf-Variant]
+    {\forall i, j.~ i \neq j \implies T_i \neq T_j \\
+      \forall i. \Gamma, \Phi \tht \tau_i ~ \wf \\
+      \forall T_{pres_i} \in \{ T_{pres_i} ~.. ~T_{pres_j} \}.~ T_{pres_i}
+      \in \overline{T}\\
+      \Gamma, \Phi \tht \rho \Lra ~'a ~\bigvee~ \Gamma, \Phi \tht \rho \Lra \epsilon}
+    {\Gamma, \Phi \tht [(\rho)~ \overline{\sim T~\kwd{of}~\tau}  > T_{pres_i} ~..~ T_{pres_j} ] ~ \wf}}
+  \and
+  {\inferrule*[left=Wf-Package]
+    {{\tt P} \in \Gamma.Modtypes \\
+      \forall i. ~ {\tt t_i} \in \Gamma.Modtypes({\tt P}) \\
+      \forall i. \Gamma, \Phi \tht \tau_i ~ \wf \\
+      \forall i ~s. t.~ transparent({\tt P.t_i}). ~\Gamma, \Phi \tht \tau_i \leq {\tt P.t_i}}
+    {\Gamma, \Phi \tht (\kwd{module} ~ {\tt P} ~ \kwd{with} ~ \overline{type ~ {\tt t} = \tau}) ~ \wf}}
+\end{mathpar}
+\end{framed}
+\caption{\label{fig:wellformed}The type wellformedness condition}
+\end{figure}

@@ -1,0 +1,114 @@
+
+\begin{figure}
+\begin{framed}
+  \begin{mathpar}
+  {\inferrule*[left=Const]
+    {c \in domain(\tau)}
+    {\Gamma, \Phi \thx \langle c : \tau\rangle }
+  }
+  \and
+  {\inferrule*[left=Var]
+    {\Gamma, \Phi, \Sigma \tht \tau \leq C.\Gamma.Values(x) \Ra \theta}
+    {\Gamma, \Phi \thx \langle x : \tau\rangle }
+  }
+  \and
+  {\inferrule*[left=Abs]
+    { \Gamma, \Phi \tht \tau \Lra \tau_d \rightarrow \tau_{cd} \\
+      \forall i.~ \Gamma, \Phi, \Sigma, \Sigma \thp \langle p_i : \tau_i\rangle  \Ra
+      (\overline{v_{i} : \tau_{v_i}}), (\overline{\tau_{\exists_i}}), \Phi_i\\
+      \forall i.~ \Gamma, \Phi \tht \tau_d \equiv \tau_i \\
+      \forall i.~ let~ \Gamma_i =
+      \Gamma \oplus_{\V} (\overline{v_{i} : \tau_{v_i}}) 
+             \oplus_{\T} (\overline{\tau_{\exists_i}})\\
+      \forall i.~ \Gamma_i, \Phi_i \thx \langle e_i : \tau_{i}'\rangle  \\
+      \forall i.~ \Gamma, \Phi \tht \tau_i' ~ wf \\
+      \forall i.~ \Gamma_I, \Phi_i \tht \tau_{cd} \equiv \tau_i'
+    }
+    {\Gamma, \Phi \thx \langle \kwd{function} ~\overline{|~ p \rightarrow e}~ : \tau\rangle }
+  }
+  \and
+  {\inferrule*[left=Abs-Label]
+    { \Gamma, \Phi \tht \tau \Lra l' : \tau_d \rightarrow \tau_{cd} \\
+      l = l' \\
+      \Gamma, \Phi, \Sigma, \Sigma \thp \langle p : \tau_{arg}\rangle  \Ra
+      (\overline{v : \tau_{v}}), (\overline{\tau_{\exists}}), \Phi'\\
+      \Gamma, \Phi \tht \tau_d \equiv \tau_{arg} \\
+      let ~ \Gamma' =
+      \Gamma \oplus_{\V} (\overline{v : \tau_{v}}) 
+             \oplus_\T (\overline{\tau_{\exists}}) \\
+      \Gamma', \Phi' \thx \langle e : \tau_{res}\rangle  \\
+      \Gamma, \Phi \tht \tau_{res} ~ wf \\
+      \Gamma', \Phi' \tht \tau_{cd} \equiv \tau_{res}
+    }
+    {\Gamma, \Phi \thx \langle \kwd{function} \sim l:p \rightarrow e : \tau\rangle }
+  }
+  \and
+  {\inferrule*[left=App]
+    { \Gamma, \Phi \thx \langle e_1 : \tau_1\rangle  \\
+      \Gamma, \Phi \thx \langle e_2 : \tau_2\rangle  \\
+      \Gamma, \Phi \tht \tau_1 \Lra \tau_d \rightarrow \tau_{cd} \\
+      \Gamma, \Phi \tht \tau_2 \equiv \tau_d \\
+      \Gamma, \Phi \tht \tau_{cd} \equiv \tau
+    }
+    {\Gamma, \Phi \thx \langle e_1 ~ e_2 : \tau\rangle  }
+  }
+  \and
+  {\inferrule*[left=Construct]
+    {\forall i.~ \Gamma, \Phi \thx \langle e_i : \tau_i\rangle  \\
+      %% \forall i. \Gamma, \Phi \tht \tau_i \equiv \tau_i' \\
+      let ~(\tau_{arg_0}, ~..~, \tau_{arg_n}, \tau_{constr}) =
+      find\_constructor(\Gamma, \Phi, T, \tau) \\
+      \Gamma, \Phi, \Sigma \tht \tau_0 \leq \tau_{arg_0} \Ra \theta_0 \\
+      \forall i_{\geq 1}. ~\Gamma, \Phi, \theta_{i-1} \tht \tau_i \leq \tau_{arg_i}
+      \Ra \theta_i \\
+      let~ \tau_{inst} = \theta_n(\tau_{constr}) \\
+      \Gamma, \Phi \tht \tau_{inst} \equiv \tau
+    }
+    {\Gamma, \Phi \thx \langle T (e_0, ~..~, e_n) : \tau\rangle }
+  }
+  \and
+  {\inferrule*[left=Let]
+    {\forall i. ~\Gamma, \Phi, \Sigma, \Sigma \thp \langle p_i : \sigma_i\rangle  \Rar
+      (\overline{v_{i} : \sigma_{v_i}}), (\overline{\tau_{\exists_i}}) \\
+      let ~\V_p = (\overline{v_{0}: \sigma_{v_0}}) \uplus .. \uplus
+      (\overline{v_{n}: \sigma_{v_n}}) \\
+      let ~\T_\exists = (\overline{\tau_{\exists_0}}) \uplus .. \uplus
+      (\overline{\tau_{\exists_0}}) \\
+      \forall i.~ \Gamma, \Phi \thx \langle e_i : \tau_i\rangle  \\
+      \forall i.~ \Gamma, \Phi, \Sigma \tht \tau_i \leq \sigma_i \Ra \theta_i\\
+      \forall i.~ check\_gen (\Gamma, \Phi, \sigma_i, e_i) \\
+      let ~ \Gamma' =
+      \Gamma \oplus_\V \V_p \oplus_\T \T_\exists \\
+      \Gamma', \Phi_n \thx \langle e' : \tau'\rangle  \\
+      \Gamma, \Phi \tht \tau' ~ wf \\
+      \Gamma', \Phi_n \tht \tau \equiv \tau'
+    }
+    {\Gamma, \Phi \thx \langle \kwd{let}~ \overline{p = e} ~~\kwd{in}~ e' : \tau\rangle }
+  }
+  \and
+  {\inferrule*[left=Letrec]
+    { \Gamma, \Phi, \Sigma, \Sigma \thp \langle p_0 : \sigma_0\rangle  \Rar
+      (\overline{v_{0} : \sigma_{v_0}}), \Phi_0 \\
+      \forall i_{\geq 1}.~ \Gamma, \Phi_{i-1}, \Sigma \thp \langle p_i :
+      \sigma_i \rangle \Rar
+      (\overline{v_{i} : \sigma_{v_i}}), \Phi_i\\
+      let ~\V_p = (\overline{v_{0}: \sigma_{v_0}}) \uplus .. \uplus
+      (\overline{v_{n}: \sigma_{v_n}}) \\
+      let ~\T_\exists = (\overline{\tau_{\exists_0}}) \uplus .. \uplus
+      (\overline{\tau_{\exists_0}}) \\
+      let ~ \Gamma' =
+      \Gamma \oplus_\V \V_p \oplus_\T \T_\exists \\
+      \forall i.~ \Gamma', \Phi_n \thx \langle e_i : \tau_i\rangle  \\
+      \forall i.~ \Gamma, \Phi, \Sigma \tht \tau_i \leq \sigma_i \Ra \theta_i \\
+      \forall i.~ check\_gen (\Gamma, \Phi, \sigma_i, e_i) \\
+      \Gamma', \Phi_n \thx \langle e' : \tau'\rangle  \\
+      \Gamma, \Phi \tht \tau' ~ wf \\
+      \Gamma', \Phi' \tht \tau \equiv \tau'
+    }
+    {\Gamma, \Phi \thx \langle \kwd{let}~ \kwd{rec}~ \overline{p = e} ~\kwd{in}~
+      e' : \tau \rangle}
+  }
+  \end{mathpar}
+  \end{framed}
+\caption{\label{fig:expressions}Type checking core-OCaml expressions}
+\end{figure}

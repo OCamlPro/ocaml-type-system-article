@@ -1,0 +1,70 @@
+
+\begin{figure}
+  \begin{framed}
+  \begin{mathpar}
+    {\inferrule*[left=Pat-Const]
+      {c \in domain(\tau)}
+      {\Gamma, \Phi, \V, \T \thp \langle c : \tau \rangle \Ra \V, \T, \Phi}
+    }
+    \and
+    {\inferrule*[left=Pat-Wildcard]
+      {}
+      {\Gamma, \Phi, \V, \T \thp \langle \_ : \tau \rangle \Ra \V, \T, \Phi}
+    }
+    \and
+    {\inferrule*[left=Pat-Var]
+      {v \notin \V \\ let ~\V' = \V \oplus (v, \tau)}
+      {\Gamma, \Phi, \V, \T \thp \langle v : \tau \rangle \Ra \V', \T, \Phi}
+    }
+    \and
+    {\inferrule*[left=Pat-Tuple]
+      { \Gamma, \Phi \tht \tau \Lra \tau_{p_0} * ~..~ * \tau_{p_n} \\
+        \Gamma, \Phi, \V, \T \thp \langle p_0 : \tau_0 \rangle \Ra \V_0, \T_0 \\
+        \forall i_{\geq 1}.~ \Gamma, \Phi_{i-1}, \V_{i-1}, \T_{i-1} \thp  p_i : \tau_i \Ra
+        \V_i, \T_i, \Phi_i \\
+        \forall i. ~\Gamma, \Phi_i \tht \tau_{p_i} \equiv \tau_i % \\
+        % let ~\V' = \V \uplus \V_0 \uplus ~.. ~\uplus \V_n \\
+        % let ~\T' = \T \cup \T_0 \cup ~..~ \cup \T_n
+      }
+      {\Gamma, \Phi, \V, \T \thp \langle p_0, ~..~, p_n : \tau \rangle \Ra \V_n, \T_n, \Phi_n}
+    }
+    \and
+    {\inferrule*[left=Pat-Or]
+      { \Gamma, \Phi, \V, \T \thp \langle p_1 : \tau_1 \rangle \Ra \V_1, \T_1 \Phi_1 \\
+        \Gamma, \Phi_1, \V~ \thp \langle p_2 : \tau_2 \rangle \Ra \V_2, \Phi_2 \\
+        \Gamma, \Phi_2 \tht \tau_1 \equiv \tau_2 \\
+        \Gamma, \Phi_2 \tht \tau_2 \equiv \tau \\
+        \Gamma, \Phi_2 \tht \V_1 \equiv \V_2\\
+        \Gamma, \Phi_2 \tht \T_1 \equiv \T_2
+      }
+      { \Gamma, \Phi, \V, \T \thp \langle p_1 ~\kwd{|} ~p_2 : \tau \rangle \Ra \V_2, \T_2, \Phi_2 }
+    }
+    \and
+    {\inferrule*[left=Pat-Construct]
+      {\Gamma, \Phi, \V, \T \thp \langle p_0 : \tau_0 \rangle \Ra \V_0, \T_0, \Phi_0 \\
+        \forall i_{\geq 1}.~ \Gamma, \Phi_{i-1}, \V_{i-1}, \T_{i-1} 
+        \thp \langle p_i : \tau_i \rangle \Ra \V_i, \T_i, \Phi_i \\
+        %% \forall i. C \tht \tau_i \equiv \tau_i' \\
+        let ~(\tau_{arg_0}, ~..~, \tau_{arg_n}, \tau_{constr}, generalized)
+        = find\_constructor(\Gamma, \Phi, T, \tau) \\
+        let~ \T_{args} =
+        existential\_types ((\tau_0 * ~..~ * \tau_n), \tau_{constr},
+                           (\tau_{arg_0} * ~..~ * \tau_{arg_n}), generalized) \\
+        \Gamma, \Phi_n, \Sigma \tht \tau_0 \leq \tau_{arg_0} \Ra \theta_0 \\
+        \forall i_{\geq 1}. ~\Gamma, \Phi_n, \theta_{i-1} \tht \tau_i \leq \tau_{arg_i}
+        \Ra \theta_i \\
+        \forall i. ~ let~\Phi_{p_i} =
+        add\_equations ((\Gamma, \Phi_{p_{i-1}}), \tau_i, \tau_{arg_i}) \\
+        let~ \Phi_{ret} = add\_equations ((\Gamma, \Phi_{p_n}), \tau,
+        \tau_{constr}) \\
+        let~ \tau_{inst} = \theta_n(\tau_{constr}) \\
+        \Gamma, \Phi_{p_n} \tht \tau_{inst} \equiv \tau%  \\
+        % let ~\V' = \V \uplus \V_0 \uplus ~.. ~\uplus \V_n \\
+        % let ~\T' = \T \cup \T_0 \cup ~.. ~\cup \T_n
+      }
+      { \Gamma, \Phi, \V, \T \thp \langle T (p_0, ~..~, p_n) : \tau \rangle \Ra \V_n, \T_n, \Phi_{ret} }
+    }
+  \end{mathpar}
+  \end{framed}
+  \caption{\label{fig:patterns}Pattern typechecking rules}
+\end{figure}
