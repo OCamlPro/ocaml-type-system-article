@@ -1,19 +1,31 @@
 \documentclass{article}
 
-\usepackage[utf8]{inputenc} % tmp fake, to remove in final version
-\usepackage[french,english]{babel} % tmp fake, to remove in final version
-\usepackage[T1]{fontenc} % tmp fake, to remove in final version
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{mathpartir}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{mathabx}
+\usepackage{txfonts}
+\usepackage{listings}
+\usepackage{stmaryrd}
 \usepackage{mathpartir}
 
-\input{header}
+\usepackage{tikz}
+
 \input{macros}
 
-\begin{document}
+\title{An OCaml Type-System for Typedtrees}
+\author{Pierrick Couderc \and Michel Mauny \and Fabrice {Le Fessant}}
 
-%\input{rules}
-%\input{rules_pat}
-%\input{rules_inst}
-%\input{rules_wf}
+\begin{document}
+\maketitle
+
+\input{rules}
+\input{rules_pat}
+\input{rules_inst}
+\input{rules_wf}
 \input{rules_annex}
 
 \end{document}

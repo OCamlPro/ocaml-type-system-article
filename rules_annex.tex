@@ -1,9 +1,8 @@
 
 %FIXME: les règles nécessitent une passe de correction
 
-\subsection{OCaml expressions (without objects)}
+\section{OCaml expressions (without objects)}
 
-\begin{framed}
 \begin{mathpar}
   {\inferrule*[left=Tuple]
     {\forall i. ~ \Gamma, \Phi \thx \langle e_i : \tau_i' \rangle \\
@@ -53,14 +52,13 @@
     {\Gamma, \Phi \thx \langle e.l : \tau \rangle}
   }
 \end{mathpar}
-\end{framed}
-%\caption{Functional features from OCaml}
-%\end{figure}
 
 
-%% \begin{figure}
-  \begin{framed}
-  \begin{mathpar}
+
+
+
+
+\begin{mathpar}
 
   {\inferrule*[left=Set-Field]
     {
@@ -122,15 +120,11 @@
   }
 
   \end{mathpar}
-  \end{framed}
-%% \caption{Imperative features}
-%% \end{figure}
+
 
 
 
   
-%% \begin{figure}
-  \begin{framed}
   \begin{mathpar}
   {\inferrule*[left=Raise]
     {
@@ -213,16 +207,9 @@
   }
 
   \end{mathpar}
-  \end{framed}
-%% \caption{Extensions}
-%% \end{figure}
-
-
   
-\subsection{OCaml patterns}
+\section{OCaml patterns}
 
-% \begin{figure}
-\begin{framed}
   \begin{mathpar}
 
     {\inferrule*[left=Pat-Record]
@@ -285,20 +272,12 @@
       }
     }
     \end{mathpar}
-\end{framed}
-%% \caption{Remaining pattern typing rules}
-%% \end{figure}
 
-
-\subsection{OCaml type annotations}
+\section{OCaml type annotations}
 
 These annotations can appear as constraints on expressions, as types of labels
 from record declaration or arguments of constructor declarations.
 
-\endinput
-
-
-\begin{framed}
   \begin{mathpar}
     {\inferrule*[left=Core-Var-Bound]
       {
@@ -431,4 +410,4 @@ from record declaration or arguments of constructor declarations.
     }
 
   \end{mathpar}
-  \end{framed}
+
