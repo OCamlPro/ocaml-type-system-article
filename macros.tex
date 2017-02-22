@@ -1,3 +1,77 @@
+
+
+\newcommand{\Ra}{\Rightarrow}
+
+\newcommand{\lstsetocaml}{
+  \lstset{
+    xleftmargin=\indentsize,
+    xrightmargin=\indentsize,
+    framexleftmargin=0.4em,
+    framexrightmargin=0.4em,
+    frame=lrtb,
+    rulecolor=\color{black},
+    inputencoding=latin1,
+    upquote=false,
+    language=[Objective]Caml,
+    literate={
+      {à}{{\`a}}1
+      {â}{{\^a}}1
+      {ä}{{\"a}}1
+      {ç}{{\c{c}}}1
+      {é}{{\'e}}1
+      {è}{{\`e}}1
+      {ê}{{\^e}}1
+      {ë}{{\"e}}1
+      {î}{{\^i}}1
+      {ï}{{\"i}}1
+      {ô}{{\^o}}1
+      {ö}{{\"o}}1
+      {ù}{{\`u}}1
+      {û}{{\^u}}1
+      {ü}{{\"u}}1
+      {lambda}{{$\mathbf{\color{blue!90!black}\lambda~}$}}1
+      {bbar}{{$\texttt{\bbar}$}}1
+      {0}{{{\color{red!50!black}0}}}1
+      {1}{{{\color{red!50!black}1}}}1
+      {2}{{{\color{red!50!black}2}}}1
+      {3}{{{\color{red!50!black}3}}}1
+      {4}{{{\color{red!50!black}4}}}1
+      {5}{{{\color{red!50!black}5}}}1
+      {6}{{{\color{red!50!black}6}}}1
+      {7}{{{\color{red!50!black}7}}}1
+      {8}{{{\color{red!50!black}8}}}1
+      {9}{{{\color{red!50!black}9}}}1
+    },
+    basicstyle=\ttfamily,
+    keywordstyle=\bfseries\color{blue!60!black},
+    commentstyle=\color{red!80!blue!40!black},
+    backgroundcolor=\color{white!95!black},
+    stringstyle=\color{red!50!black},
+    showstringspaces=false,
+    numbers=none,
+%    deletekeywords={true,false,object,class,ref},
+    numberstyle=\color{black}\tt\tiny,
+    stepnumber=1,
+    numbersep=5pt,
+    mathescape=true,
+  }
+}
+
+\def\kwd#1{\hbox{\rm\texttt{\textbf{\color{blue!60!black}#1}}}}
+
+
+\def\rightcomment#1{\hfill{\rm\em #1}}
+
+\newcommand{\FIXME}[1]{%
+  \setlength{\marginparwidth}{1.7cm}%
+  \raisebox{0.5ex}{\hbox to
+    0cm{{\textcolor{red}{\mbox{$^*$}}}}}%
+  \marginpar{\color{red}\vskip -1em\tiny\mbox{$^*$}#1}%
+}
+
+\lstsetocaml
+
+\def\wf{\hbox{\em wf}}
   \newcommand{\V}{\mathcal{V}}
   \newcommand{\I}{\mathcal{I}}
   \newcommand{\T}{\mathcal{T}}

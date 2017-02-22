@@ -1,6 +1,5 @@
+\section{Pattern typechecking rules}
 
-\begin{figure}
-  \begin{framed}
   \begin{mathpar}
     {\inferrule*[left=Pat-Const]
       {c \in domain(\tau)}
@@ -65,6 +64,3 @@
       { \Gamma, \Phi, \V, \T \thp \langle T (p_0, ~..~, p_n) : \tau \rangle \Ra \V_n, \T_n, \Phi_{ret} }
     }
   \end{mathpar}
-  \end{framed}
-  \caption{\label{fig:patterns}Pattern typechecking rules}
-\end{figure}
